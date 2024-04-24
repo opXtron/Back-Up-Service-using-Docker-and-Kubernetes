@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-cronjob
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - image: backup
+            imagePullPolicy: IfNotPresent
+            name: backup
+            volumeMounts:
+            - name: data-volume
+              mountPath: app/folder/
+            - name: credentials
+              mountPath: app/credentials/
+          volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: data-pvc
+          - name: credentials
+            secret:
+              secretName: google-token
+          restartPolicy: OnFailure
+  schedule: '* * * * *'
